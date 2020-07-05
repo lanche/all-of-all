@@ -24,14 +24,13 @@ public class CJlibProxy implements MethodInterceptor {
         enhancer.setCallback(this);
         // 创建代理
         return enhancer.create();
-
     }
 
     public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
         long start = System.nanoTime();
         Object result = methodProxy.invokeSuper(o, objects);
         long end = System.nanoTime();
-        log.info("执行耗时:{}ps", (end - start)/1000);
+        log.info("{}的方法{}执行耗时:{}ps", o.getClass().getSuperclass().getSimpleName(), method.getName(), (end - start) / 1000);
         return result;
     }
 }

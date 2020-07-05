@@ -1,8 +1,6 @@
 package algorithm
 
 import designPattern.Proxy.CJlibProxy
-import designPattern.Proxy.CjlibDynamicProxy
-import designPattern.Proxy.TxtHandler
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -27,9 +25,20 @@ class LongestPalindromeTest extends Specification {
         expect:
         output == services.longestPalindromeViolence(input)
         where:
-        input || output
-        "abcdcb" || "bcdcb"
-        "abc" || "a"
+        input                  || output
+        "abcdcb"               || "bcdcb"
+        "abc"                  || "a"
+        "abcdcbabckdkhgkgmmmg" || "abcdcba"
+    }
+
+    @Unroll
+    def "longestPalindrome 中心扩散法"() {
+        expect:
+        output == services.longestPalindromeCenterSpread(input)
+        where:
+        input                  || output
+        "abcdcb"               || "bcdcb"
+        "abc"                  || "a"
         "abcdcbabckdkhgkgmmmg" || "abcdcba"
     }
 }
