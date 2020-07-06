@@ -37,6 +37,7 @@ public class MaxSubArray {
             maxValue = curValue > maxValue ? curValue : maxValue;
             curValue = curValue < 0 ? 0 : curValue;
         }
+        System.out.println();
         return maxValue;
     }
 
