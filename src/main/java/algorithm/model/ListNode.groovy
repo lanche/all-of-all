@@ -4,7 +4,7 @@ package algorithm.model
  * @author lanche* @Date 2020/7/7
  * @Description
  */
-class ListNode {
+public class ListNode {
     public int val;
     public ListNode next;
 
