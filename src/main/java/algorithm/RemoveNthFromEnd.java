@@ -17,6 +17,7 @@ public class RemoveNthFromEnd {
      * @return
      */
     public ListNode removeNthFromEnd(ListNode head, int n) {
+        // 设置哑结点，方便返回头结点
         ListNode dummy = new ListNode(0);
         dummy.next = head;
         ListNode first = dummy;

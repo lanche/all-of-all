@@ -29,7 +29,15 @@ import algorithm.model.ListNode;
  */
 public class MergeTwoLists {
 
-    public ListNode mergeTwoLists(ListNode l1, ListNode l2){
+    /**
+     * 普通遍历方式
+     * 思路：判断两个链表
+     *
+     * @param l1
+     * @param l2
+     * @return
+     */
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
         if (l1 == null || l2 == null) {
             return l1 == null ? l2 : l1;
         }
@@ -49,6 +57,13 @@ public class MergeTwoLists {
         return dummy.next;
     }
 
+    /**
+     * 递归方式
+     *
+     * @param l1
+     * @param l2
+     * @return
+     */
     public ListNode mergeTwoListsRecursive(ListNode l1, ListNode l2) {
         if (l1 == null) {
             return l2;
