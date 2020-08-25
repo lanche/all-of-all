@@ -30,4 +30,17 @@ class MaxAreaTest extends Specification {
         [1, 8, 6, 2, 5, 4, 8, 3, 7] || 49
         [1, 8, 6]                   || 6
     }
+
+    def "sum"() {
+        setup:
+        when:
+        for (int i = 16; i < 100;) {
+            Thread.sleep(1000)
+            println "运算前的i值：" + i
+            System.out.println(i >>>= 1);
+            println "运算后的i值：" + i
+        }
+        then:
+        noExceptionThrown()
+    }
 }
