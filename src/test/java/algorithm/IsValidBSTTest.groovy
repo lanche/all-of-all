@@ -1,5 +1,6 @@
 package algorithm
 
+import algorithm.leetcode.IsValidBST
 import algorithm.model.TreeNode
 import designPattern.Proxy.CJlibProxy
 import spock.lang.Shared

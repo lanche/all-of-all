@@ -1,5 +1,6 @@
 package algorithm
 
+import algorithm.leetcode.MaxArea
 import designPattern.Proxy.CJlibProxy
 import spock.lang.Shared
 import spock.lang.Specification
