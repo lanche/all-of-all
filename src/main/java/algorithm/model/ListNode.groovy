@@ -1,7 +1,8 @@
 package algorithm.model
 
 /**
- * @author lanche* @Date 2020/7/7
+ * @author lanche\
+ * @Date 2020/7/7
  * @Description
  */
 public class ListNode {
