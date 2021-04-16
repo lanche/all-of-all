@@ -1,4 +1,5 @@
 import model.Person;
+import model.Student;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,4 +10,7 @@ import java.util.List;
  * @Description
  */
 public class BootStrap {
+    public static void main(String[] args) {
+        new Student().run();
+    }
 }

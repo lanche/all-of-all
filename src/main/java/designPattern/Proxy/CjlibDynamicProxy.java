@@ -17,6 +17,7 @@ public class CjlibDynamicProxy {
         CjlibTxtHandler cjlibTxtHandler = new CjlibTxtHandler();
         TxtHandler txtHandler = (TxtHandler) cjlibTxtHandler.getInstance(new TxtHandler());
         txtHandler.process("我是通过cjlib代理产生的");
+        new TxtHandler().process("我是自己产生的");
     }
 
 
@@ -35,9 +36,11 @@ public class CjlibDynamicProxy {
 
         }
 
+        @Override
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-
+            System.out.println("有代理");
             methodProxy.invokeSuper(o, objects);
+            System.out.println("代理结束了");
             return null;
         }
     }

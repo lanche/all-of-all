@@ -19,6 +19,14 @@ public class Person {
         this.name = name;
     }
 
+    public void say() {
+        System.out.println("a person");
+    }
+
+    public void handle() {
+        say();
+    }
+
     public String getName() {
         return name;
     }
