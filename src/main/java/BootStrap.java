@@ -1,8 +1,4 @@
-import model.Person;
 import model.Student;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @Author hezhensheng

@@ -30,14 +30,11 @@ public class ThreadPoolExceptionHandler {
 
     public static void main(String[] args) {
          AtomicInteger count = new AtomicInteger();
-         Person person = new Person("hzs", 20);
         AtomicInteger result = handleAndGet(() -> {
             logger.info("count:{}", count.get());
             count.addAndGet(2);
-            person.setName(person.getName() + "_");
         });
         System.out.println(count.get());
-        System.out.println(person.getName());
     }
 
     public static String test(String str) {
@@ -53,6 +50,7 @@ public class ThreadPoolExceptionHandler {
         integers.parallelStream().forEach(e -> {
             try {
                 threadPool.submit(runnable).get();
+                Thread.sleep(2000);
             } catch (Exception ex) {
 
             }

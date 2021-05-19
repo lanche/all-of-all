@@ -8,7 +8,7 @@ package utils.sql;
 public class DBHelper {
 
     public static void main(String[] args) {
-        System.out.println(shard("1579593319"));
+        System.out.println(shard("1041260570"));
     }
 
     public static long shard(String shardingKey) {

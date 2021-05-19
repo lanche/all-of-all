@@ -1,0 +1,39 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+'缓存：秒级时间戳作为key，value为Set集合，放着热点accountId
+'Redis：hash结构，key时间戳，value的hash为key为账户id，value为这1s内的统计值
+'热点户定义：最近一段时间（默认5s）超过限流阈值（默认60每秒）的总和是否超过汇总的阈值（默认100）
+start
+:ClickServlet.handleRequest();
+:new page;
+if (Page.onSecurityCheck) then (true)
+  :Page.onInit();
+  if (isForward?) then (no)
+    :Process controls;
+    if (continue processing?) then (no)
+      stop
+    endif
+
+    if (isPost?) then (yes)
+      :Page.onPost();
+    else (no)
+      :Page.onGet();
+    endif
+    :Page.onRender();
+  endif
+else (false)
+endif
+
+if (do redirect?) then (yes)
+  :redirect process;
+else
+  if (do forward?) then (yes)
+    :Forward request;
+  else (no)
+    :Render page template;
+  endif
+endif
+
+stop
+
+@enduml

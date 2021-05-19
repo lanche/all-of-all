@@ -1,4 +1,4 @@
-package utils.sql;
+package utils.object;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

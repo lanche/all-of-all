@@ -1,0 +1,88 @@
+@startuml
+participant BizRpcImpl as bizRpc
+database DB as db
+queue MQ as mq
+participant Consumer as consumer
+
+== 入账 ==
+-> bizRpc: 入账请求
+alt 入款
+    bizRpc -> db:流水落库
+    bizRpc -> mq: 判断流水是否属于热点账户并\n发送到对应的topic中
+else 出款
+    bizRpc -> db:流水落库
+    bizRpc -> db:更新商户余额
+end
+<-- bizRpc:返回请求结果
+== 记账 ==
+mq -> consumer: 按queue消费
+consumer -> consumer: 判断是否是热点户
+alt 热点户
+    consumer -> db:汇总记账
+else 非热点户
+    consumer -> db:实时记账
+end
+== 兜底 ==
+
+@enduml
+
+@startuml
+actor User as user
+participant BizRpcImpl as bizRpc
+participant Redis as redis
+database DB as db
+queue MQ as mq
+participant Consumer as consumer
+
+== 出款 ==
+user -> bizRpc: 出款请求
+bizRpc -> redis:根据账户id加锁获取余额
+note right:同一个账户id共用一把锁
+bizRpc -> bizRpc:判断余额是否小于出款金额
+alt 余额大于等于出款金额
+    bizRpc -> db: 插入流水到数据库
+    bizRpc -> redis: redis更新余额
+    bizRpc -> redis: 释放Redis锁
+    user <- bizRpc: 返回出款成功
+else 余额小于出款金额
+    bizRpc -> db: 查询所有出款流水是否处理完毕
+    note right: 1.需要保证没有未处理的出款流水，\n否则可能会导致透支\n2.目前流水表中账户id有索引
+    alt 出款流水处理完毕
+        bizRpc -> db: 获取最新账户余额
+        alt 余额大于等于出款金额
+            bizRpc -> db: 插入流水到数据库
+            bizRpc -> redis: redis更新余额
+            note right: redis中最新余额为db查询出来的\n余额减出款金额
+            bizRpc -> redis: 释放Redis锁
+            user <- bizRpc: 返回出款成功;
+        else 余额小于出款金额
+            bizRpc -> redis: 更新redis中余额为查询的余额
+            note right: 查询的余额可能够下一笔出款
+            bizRpc -> redis: 释放Redis锁
+            user <- bizRpc: 返回余额不足，出款失败
+        end
+    else 有出款流水未处理
+        bizRpc -> db: 查询该账户下所有未记账的出款流水
+        bizRpc -> bizRpc: 内存中汇总所有出款流水
+        bizRpc -> db: 获取账户余额
+        bizRpc -> bizRpc: 内存中计算账户余额 - 汇总金额 - 待出款金额差值
+        note right:在内存中计算而不更新数据库，\n一个更快返回结果，二是避免\n与线程池的记账线程产生竞争
+        alt 差值大于等于0
+             bizRpc -> db: 插入流水到数据库
+             bizRpc -> redis: 更新redis中余额为计算的差值
+             bizRpc -> redis: 释放Redis锁
+             user <- bizRpc: 返回出款成功;
+        else 差值小于0
+             bizRpc -> redis: 更新redis中余额为账户余额 - 汇总金额
+             bizRpc -> redis: 释放Redis锁
+             user <- bizRpc: 返回余额不足，出款失败;
+        end
+    end
+end
+bizRpc --> mq: 插入出款流水成功后，按账户id发送到MQ指定分区
+mq -> consumer: 将出款消息发送到订阅的consumer
+consumer -> consumer: 将消息投递到对应单线程线\n程池中（与入款共用一个）
+db <- consumer: 给账户减钱，并更新流水状态
+
+@enduml
+
