@@ -34,13 +34,11 @@ class MaxAreaTest extends Specification {
     def "sum"() {
         setup:
         when:
-        for (int i = 16; i < 100;) {
-            Thread.sleep(1000)
-            println "运算前的i值：" + i
-            System.out.println(i >>>= 1);
+        for (int i = 16; i < 17; i++) {
             println "运算后的i值：" + i
         }
         then:
+        println(" ".split(" ").length)
         noExceptionThrown()
     }
 }

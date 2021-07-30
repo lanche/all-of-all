@@ -14,13 +14,26 @@ public class CQueue {
 
     }
 
+    /**
+     * 栈是先进后出，用两个栈操作后变为了先进先出，第一个栈进，第二个栈取数
+     */
     Stack<Integer> stack1 = new Stack<Integer>();
     Stack<Integer> stack2 = new Stack<Integer>();
 
+    /**
+     * 在队列末尾时添加元素时插入第一个栈
+     * @param value
+     */
     public void appendTail(int value) {
         stack1.push(value);
     }
 
+    /**
+     * 删除队列头部元素时从第二个栈出，但是有两种情况：
+     * 第二个栈元素不为空，直接从栈出来即可
+     * 第二个元素为空，需要把第一个中元素全部放入第二个元素再弹出
+     * @return
+     */
     public int deleteHead() {
         if(stack2.isEmpty()){
             if(stack1.isEmpty()) {
