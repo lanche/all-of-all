@@ -1,0 +1,106 @@
+@startuml
+participant Seller as seller
+database DB as db
+participant AccountBook as accountBook
+participant Channel as channel
+participant Wechat as wechat
+
+seller -> db :获取二级商户列表
+seller -> accountBook :创建账户
+seller <-- accountBook :返回创建结果
+seller -> channel: 查询微信余额
+channel -> wechat: 查询微信余额
+channel <-- wechat: 返回余额
+seller <- channel: 返回余额
+seller -> db: 更新商户余额及同步状\n态（未同步变为已同步）
+
+@enduml
+
+@startuml
+participant Seller as seller
+database DB as db
+participant AccountBook as accountBook
+participant Channel as channel
+participant Wechat as wechat
+
+seller -> db :获取二级商户列表
+seller -> accountBook :查询快手余额
+seller <-- accountBook :返回余额
+seller -> channel: 查询微信余额
+channel -> wechat: 查询微信余额
+channel <-- wechat: 返回余额
+seller <- channel: 返回余额
+seller -> seller: 校验快手余额和微信\n余额是否一致
+alt 余额一致
+    seller -> seller: 核对成功次数+1;
+    alt 成功次数达到设定的阈值
+        seller -> db:商户状态置为启用
+    end
+else 余额不一致
+    seller -> db: 商户状态置为校验失败
+end
+
+@enduml
+
+@startuml
+actor 商户 as merchant
+participant 会员 as seller
+database SellerDB as db
+participant 网关 as gateway
+participant 微信 as wechat
+
+== 初次查询持久化 ==
+merchant -> seller:查询商户信息
+alt 开关打开
+    seller -> db:查询结算账户信息
+    alt db存在
+        seller <-- db:返回结算账户信息
+        merchant <-- seller:返回商户信息
+    else db中不存在
+        seller -> gateway: 从网关查询结算账户信息
+        gateway -> wechat: 调用微信接口查询结算账户信息
+        gateway <-- wechat: 返回结算账户信息
+        seller <-- gateway: 返回结算账户信息
+        seller -> db: 判断结算账户的验证状态，是否需要保存的数据库
+        merchant <-- seller:返回商户信息
+    end
+else 开关关闭
+    seller -> wechat: 直接查询微信
+end
+
+== 定时同步 ==
+seller -> gateway: 从网关查询结算账户信息
+gateway -> wechat: 调用微信接口查询结算账户信息
+gateway <-- wechat: 返回结算账户信息
+seller <-- gateway: 返回结算账户信息
+alt 账户信息发生了变动
+    seller -> db :更新数据库的结算账户信息
+end
+
+@enduml
+
+@startuml
+start
+:保证微信余额稳定;
+note right
+在凌晨的时候通过压单实现，保证用户的现金户余额不会变动
+end note
+:获取未同步的二级商户号;
+note right
+二级商户号由状态机控制商户的行为
+end note
+:同步余额到新账户;
+:分账、提现等业务放量;
+note right
+此时还是以微信的余额为准
+end note
+:账户记账;
+:微信和快手核对;
+:核对成功次数达到阈值状态置为生效;
+note right
+灰度放量策略
+end note
+:账户余额生效;
+end
+@enduml
+

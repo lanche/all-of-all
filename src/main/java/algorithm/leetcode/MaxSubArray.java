@@ -32,12 +32,11 @@ public class MaxSubArray {
         }
         int maxValue = Integer.MIN_VALUE;
         int curValue = 0;
-        for (int i = 0; i < nums.length; i++) {
-            curValue += nums[i];
-            maxValue = curValue > maxValue ? curValue : maxValue;
-            curValue = curValue < 0 ? 0 : curValue;
+        for (int num : nums) {
+            curValue += num;
+            maxValue = Math.max(curValue, maxValue);
+            curValue = Math.max(curValue, 0);
         }
-        System.out.println();
         return maxValue;
     }
 

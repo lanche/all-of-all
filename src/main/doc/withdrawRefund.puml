@@ -1,0 +1,21 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+participant Order as order
+queue MQ as mq
+participant Seller as seller
+database SellerDB as db
+participant AccountBook as accountBook
+
+autonumber
+order -> mq :发送退票订单到消息队列中
+mq -> seller :消费消息
+seller -> seller :消息合法校验
+seller -> seller :判断该二级商户\n是否已同步余额
+seller -> db :查询seller的提现\n退票单是否存在
+alt 不存在
+    seller -> accountBook :调用账户记账
+else 存在
+    seller -> mq :success
+end
+
+@enduml

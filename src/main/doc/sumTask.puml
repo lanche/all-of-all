@@ -1,0 +1,77 @@
+
+@startuml
+start
+:多个实例的任务调度开始;
+:根据不同的任务类型，解析task任务参数，获取当前实例任务分片\n列表，构建任务执行参数列表;
+:将任务提交到线程池;
+fork
+    :thread1;
+fork again
+    :thread2;
+fork again
+    :thread3;
+fork again
+    :thread4;
+end fork
+:任务开始执行;
+repeat
+    :批量查询未记账的流水flow;
+    :根据分组的key对凭证进行分组Map<String, List<Flow>>;
+    while (map遍历) is (未结束)
+        :每一组的凭证汇总成一条汇总流水SummaryFlow;
+        :开启事务;
+        :保存SummaryFlow到数据库;
+        :批量更新Flow的状态为已汇总，设置汇总批次号;
+        if(更新成功的行数与汇总的流水\nsize大小是否一致) then (yes)
+            :提交事务;
+        else (no)
+            :事务回滚;
+        endif;
+            :汇总流水SummaryFlow异步记账;
+            note left
+            调用@Async注解的方法recordAsync记账
+            end note
+    endwhile(结束)
+repeat while (flow的size等于查询的size)
+stop
+@enduml
+
+@startuml
+start
+:收到SummaryFlow;
+fork
+    :thread1;
+fork again
+    :thread2;
+fork again
+    :thread3;
+fork again
+    :thread4;
+end fork
+if(该汇总流水对应的账户昨日是否已完成记账) then (yes)
+    :开启事务;
+    :根据汇总流水的出入金类型给账户加钱或者减钱;
+    :更新汇总流水的状态为已记账;
+    if(更新汇总流水成功) then (yes)
+        :提交事务;
+    else (no)
+        :抛异常，事务回滚;
+    endif
+else (no)
+    :告警，昨日记账任务未完成;
+endif
+
+stop
+@enduml
+
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+(*) --> "日终任务启动"
+--> "处理前一天还未处理的flow和summaryFlow"
+--> "处理完毕，将前一日的账户记账进度标志置为'已完成'"
+--> "生成当天的记账进度记录，状态未'未完成'"
+--> (*)
+@enduml
+
+

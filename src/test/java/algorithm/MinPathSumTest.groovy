@@ -25,11 +25,9 @@ class MinPathSumTest extends Specification {
         when:
         int r1 = services.minPathSum(grid)
         int r2 = services.minPathSum(grid)
-        String[] array = "look you".split("o");
         then:
         r1 == 7
         r2 == 7
-        println(array)
     }
 
 

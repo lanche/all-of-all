@@ -6,4 +6,15 @@ import spock.lang.Specification
  */
 class ForeachTest extends Specification {
 
+    def "HashMap accepts null key"() {
+        given:
+        def map = new HashMap()
+
+        when:
+        map.put(null, "elem")
+
+        then:
+        notThrown(NullPointerException)
+    }
+
 }
