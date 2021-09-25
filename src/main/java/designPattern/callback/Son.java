@@ -1,7 +1,5 @@
 package designPattern.callback;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * @Author hezhensheng
  * @Date 2021/1/20

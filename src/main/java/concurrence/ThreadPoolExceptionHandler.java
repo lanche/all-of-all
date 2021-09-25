@@ -3,10 +3,6 @@ package concurrence;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -14,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-import model.Person;
 import model.Result;
 
 /**
